@@ -80,5 +80,4 @@ fn main() {
 
     // Print the final result
     println!("Summed calibration values: {}", total_result);
-
 }
