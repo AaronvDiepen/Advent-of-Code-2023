@@ -99,8 +99,8 @@ fn main() {
 
     // Get the first line from the input
     if let Some(Ok(first_line)) = reader.lines().next() {
-        // Get the line length of the first line
-        let line_length: u64 = first_line.len().try_into().unwrap();
+        // Get the line length of the first line including newline
+        let line_length: u64 = first_line.len() as u64 + 1;
 
         // Create a vector to store the handles to the spawned threads
         let mut handles = vec![];
@@ -134,7 +134,7 @@ fn main() {
                 if let Err(err) = thread_reader.seek(
                     SeekFrom::Start(
                         (i * num_lines_per_thread - ((i != 0 && num_lines_per_thread > 0) as u64))
-                        * (line_length + 1))) {
+                        * line_length)) {
                     eprintln!("Error seeking position: {}", err);
                 }
 
