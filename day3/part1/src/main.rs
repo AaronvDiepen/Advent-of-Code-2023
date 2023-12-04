@@ -65,7 +65,7 @@ fn main() {
     // Get the first line from the input
     if let Some(Ok(first_line)) = reader.lines().next() {
         // Get the line length of the first line including newline
-        let line_length: u64 = first_line.len() + 1;
+        let line_length: u64 = first_line.len() as u64 + 1;
 
         // Create a vector to store the handles to the spawned threads
         let mut handles = vec![];
