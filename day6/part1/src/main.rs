@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 // Find the range of solutions for n to the problem d + 1 < (n * t - n)
-fn find_integer_solution_range(t: i64, d: i64) -> i64 {
+fn find_integer_solution_range(t: u64, d: u64) -> u64 {
     // Calculate the determinant
     let discriminant = (t.pow(2) - 4 * (d + 1)) as f64;
 
@@ -17,7 +17,8 @@ fn find_integer_solution_range(t: i64, d: i64) -> i64 {
     }
 
     // Calculate the lowest and highest valid integer solutions
-    let discriminant_sqrt = discriminant.sqrt() as i64;
+    let discriminant_sqrt = discriminant.sqrt() as u64;
+
     let n1 = t - (t + discriminant_sqrt) / 2;
     let n2 = t - (t - discriminant_sqrt + 1) / 2;
 
@@ -33,8 +34,11 @@ fn main() {
     // Create a single parser for all the lines
     let mut parser = reader.lines();
 
-    // Read times and distances, zip them together, find their respective range of integer solutions and multiply those together
-    let result: i64 = parser.by_ref()
+    // Read times and distances, by splitting on whitespace and skipping the descriptors
+    // Then zip them together
+    // Then find their respective range of integer solutions
+    // Then multiply those together
+    let result: u64 = parser.by_ref()
         .next()
         .unwrap()
         .expect("Could not get times line")

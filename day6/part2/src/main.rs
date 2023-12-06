@@ -4,7 +4,7 @@ use std::io::{BufRead, BufReader};
 const RADIX: u32 = 10;
 
 // Find the range of solutions for n to the problem d + 1 < (n * t - n)
-fn find_integer_solution_range(t: i64, d: i64) -> i64 {
+fn find_integer_solution_range(t: u64, d: u64) -> u64 {
     // Calculate the determinant
     let discriminant = (t.pow(2) - 4 * (d + 1)) as f64;
 
@@ -19,7 +19,8 @@ fn find_integer_solution_range(t: i64, d: i64) -> i64 {
     }
 
     // Calculate the lowest and highest valid integer solutions
-    let discriminant_sqrt = discriminant.sqrt() as i64;
+    let discriminant_sqrt = discriminant.sqrt() as u64;
+
     let n1 = t - (t + discriminant_sqrt) / 2;
     let n2 = t - (t - discriminant_sqrt + 1) / 2;
 
@@ -35,22 +36,23 @@ fn main() {
     // Create a single parser for all the lines
     let mut parser = reader.lines();
 
-    // Read time and distance by getting all digit characters on their lines, then folding them together into numbers and finding their range of integer solutions
-    let result: i64 = find_integer_solution_range(
+    // Read time and distance, by getting all digit characters on their lines then folding them together into numbers
+    // Then find the range of integer solutions
+    let result = find_integer_solution_range(
         parser.by_ref()
             .next()
             .unwrap()
             .expect("Could not get time line")
             .chars()
             .filter(|&c| c.is_digit(RADIX))
-            .fold(0, |acc, digit| acc * RADIX as i64 + digit.to_digit(RADIX).unwrap() as i64),
+            .fold(0, |acc, digit| acc * RADIX as u64 + digit.to_digit(RADIX).unwrap() as u64),
         parser.by_ref()
             .next()
             .unwrap()
             .expect("Could not get distance line")
             .chars()
             .filter(|&c| c.is_digit(RADIX))
-            .fold(0, |acc, digit| acc * RADIX as i64 + digit.to_digit(RADIX).unwrap() as i64)
+            .fold(0, |acc, digit| acc * RADIX as u64 + digit.to_digit(RADIX).unwrap() as u64)
         );
 
     // Print the final result
