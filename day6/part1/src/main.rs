@@ -44,7 +44,7 @@ fn main() {
         .expect("Could not get times line")
         .split_whitespace()
         .skip(1)
-        .map(|s| s.parse().unwrap())
+        .map(|time| time.parse().unwrap())
         .zip(
             parser.by_ref()
             .next()
@@ -52,7 +52,7 @@ fn main() {
             .expect("Could not get distances line")
             .split_whitespace()
             .skip(1)
-            .map(|s| s.parse().unwrap())
+            .map(|distance| distance.parse().unwrap())
         )
         .map(|(time, distance)| find_integer_solution_range(time, distance))
         .product();

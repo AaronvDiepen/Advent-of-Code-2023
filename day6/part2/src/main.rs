@@ -36,7 +36,7 @@ fn main() {
     // Create a single parser for all the lines
     let mut parser = reader.lines();
 
-    // Read time and distance, by getting all digit characters on their lines then folding them together into numbers
+    // Read time and distance, by filtering all digit characters from the input then folding them together into numbers
     // Then find the range of integer solutions
     let result = find_integer_solution_range(
         parser.by_ref()
@@ -44,15 +44,15 @@ fn main() {
             .unwrap()
             .expect("Could not get time line")
             .chars()
-            .filter(|&c| c.is_digit(RADIX))
-            .fold(0, |acc, digit| acc * RADIX as u64 + digit.to_digit(RADIX).unwrap() as u64),
+            .filter_map(|c| c.to_digit(RADIX))
+            .fold(0, |time, digit| time * RADIX as u64 + digit as u64),
         parser.by_ref()
             .next()
             .unwrap()
             .expect("Could not get distance line")
             .chars()
-            .filter(|&c| c.is_digit(RADIX))
-            .fold(0, |acc, digit| acc * RADIX as u64 + digit.to_digit(RADIX).unwrap() as u64)
+            .filter_map(|c| c.to_digit(RADIX))
+            .fold(0, |distance, digit| distance * RADIX as u64 + digit as u64)
         );
 
     // Print the final result
