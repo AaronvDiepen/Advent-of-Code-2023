@@ -10,16 +10,14 @@ fn process_line(line: &str) -> u32 {
     let mut result = 0;
 
     // Get the first digit and multiply it by the RADIX and add it to result
-    line.chars()
-        .find(|c| c.is_digit(RADIX))
-        .and_then(|c| c.to_digit(RADIX))
-        .map(|a| result += a * RADIX);
+    result += line.chars()
+        .find_map(|c| c.to_digit(RADIX))
+        .unwrap() * RADIX;
     
     // Get the last digit and add it to result
-    line.chars().rev().
-        find(|c| c.is_digit(RADIX))
-        .and_then(|c| c.to_digit(RADIX))
-        .map(|b| result += b);
+    result += line.chars().rev()
+        .find_map(|c| c.to_digit(RADIX))
+        .unwrap();
 
     result
 }
