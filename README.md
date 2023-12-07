@@ -11,25 +11,31 @@ Make sure to install [Rust and Cargo](https://doc.rust-lang.org/cargo/getting-st
 Clone the project
 
 ```bash
-    git clone https://github.com/AaronvDiepen/Advent-of-Code-2023
+git clone https://github.com/AaronvDiepen/Advent-of-Code-2023
 ```
 
-After navigating to a day[X] and part[Y] the code can be run using
+After navigating to a day[X] and part[Y]
+
+```bash
+cd day${X}/part${Y}
+```
+
+The code can be run using
 
 ```bash
 cargo run
 ```
 
-Or optimally be build using 
+Or optimally the binary can be build using 
 
 ```bash
 cargo build --release
 ```
 
-After which they can be ran using
+After which the solutions can be ran using
 
 ```bash
-./day[X]-part[Y]
+target/release/day${X}-part${Y}
 ```
 
 As examples my personal input files that Advent of Code generated for me are contained in the repo so these can be used as examples.
