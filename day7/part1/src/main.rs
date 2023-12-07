@@ -1,7 +1,7 @@
-use std::fs::{File, metadata};
+use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::sync::{Arc, Mutex};
-use std::thread;
+
+use rayon::prelude::*;
 
 const RADIX: u32 = 10;
 
@@ -66,14 +66,16 @@ fn score_hand(card_counts: Vec<usize>) -> usize {
 }
 
 // Function that processes each line
-fn process_line(line: &str, shared_output: &Arc<Mutex<Vec<(usize, [usize; 5], u64)>>>) {
+fn process_line(line: String) -> (usize, [usize; 5], u64) {
     let mut parser = line.chars();
     
     // Parse the first characters before a space to a hand
-    let parsed_hand: Vec<usize> = parser.by_ref()
+    let parsed_hand: [usize; 5] = parser.by_ref()
         .take_while(|c| *c != ' ')
         .map(parse_card)
-        .collect();
+        .collect::<Vec<usize>>()
+        .try_into()
+        .expect("Failed to get 5 cards in a hand");
 
     // Count the number of matching cards of each kind
     let mut card_counts = vec![0; 13];
@@ -87,82 +89,34 @@ fn process_line(line: &str, shared_output: &Arc<Mutex<Vec<(usize, [usize; 5], u6
         .filter_map(|c| c.to_digit(RADIX))
         .fold(0, |bid, digit| bid * RADIX as u64 + digit as u64);
 
-    // Write to the shared output
-    let mut output = shared_output.lock().unwrap();
-    output.push((score, (parsed_hand[0], parsed_hand[1], parsed_hand[2], parsed_hand[3], parsed_hand[4]).into(), bid));
+    (score, parsed_hand, bid)
 }
 
 fn main() {
-    // Extract the file length from the metadata
-    let file_length: usize = metadata("input").expect("Could not get input file metadata").len().try_into().unwrap();
-
     // Open the input file
     let file = File::open("input").expect("Could not open file \"input\" relative to program");
-    let reader = BufReader::new(file);
 
-    // Get the first line from the input
-    if let Some(Ok(first_line)) = reader.lines().next() {
-        // Get the line length of the first line including newline
-        let line_length: usize = first_line.len() + 1;
+    // Parse the lines to hands
+    let mut parsed_lines = BufReader::new(file)
+        .lines()
+        .par_bridge()
+        .map(|line| line.ok())
+        .while_some()
+        .map(process_line)
+        .collect::<Vec<(usize, [usize; 5], u64)>>();
 
-        // Create a thread-safe reader
-        let file = File::open("input").expect("Could not open file \"input\" relative to program");
-        let reader = BufReader::new(file);
-        let thread_safe_reader = Arc::new(Mutex::new(reader));
+    // Sort the hands
+    // primary key:     type of hand
+    // secondary key:   cards in hand
+    // tertiary key:    bid
+    parsed_lines.sort();
 
-        // Create a vector to store the handles to the spawned threads
-        let mut handles = vec![];
-
-        // Get the number of lines in the file assuming equal length and create an array to store partial output
-        let num_lines = file_length / line_length;
-
-        let hands_parsed: Arc<Mutex<Vec<(usize, [usize; 5], u64)>>> = Arc::new(Mutex::new(Vec::with_capacity(num_lines)));
-
-        // Spawn threads
-        for _ in 0..num_cpus::get() {
-            let thread_safe_reader_clone = Arc::clone(&thread_safe_reader);
-            let hands_parsed_clone = Arc::clone(&hands_parsed);
-
-            // Spawn a new thread
-            let handle = thread::spawn(move || {
-                // Inside the thread, each thread processes a portion of the input
-
-                // Lock the reader and read lines
-                while let Ok(mut locked_reader) = thread_safe_reader_clone.lock() {
-                    let mut line = String::new();
-
-                    // Read a line from the reader
-                    match locked_reader.read_line(&mut line) {
-                        Ok(0) => break, // End of file
-                        Ok(_) => process_line(&line, &hands_parsed_clone),
-                        Err(e) => eprintln!("Error reading line: {}", e),
-                    }
-                }
-            });
-
-            // Save the handle to the vector
-            handles.push(handle);
-        }
-
-        // Wait for all threads to finish and collect results
-        for handle in handles {
-            handle.join().unwrap();
-        }
-
-        // Sort the hands
-        // primary key:     type of hand
-        // secondary key:   cards in hand
-        // tertiary key:    bid
-        let mut parsed_hands = hands_parsed.lock().unwrap();
-        parsed_hands.sort();
-
-        // Sum the rank times bid for each hand
-        let total_result: u64 = parsed_hands.iter()
-            .enumerate()
-            .map(|(i, hand)| (i + 1) as u64 * hand.2)
-            .sum();
+    // Sum the rank times bid for each hand
+    let total_result: u64 = parsed_lines.par_iter()
+        .enumerate()
+        .map(|(i, (_, _, bid))| (i + 1) as u64 * bid)
+        .sum();
         
-        // Print the final result
-        println!("Number of cards scratched: {}", total_result);
-    }
+    // Print the final result
+    println!("Number of cards scratched: {}", total_result);
 }
