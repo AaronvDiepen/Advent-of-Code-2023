@@ -25,24 +25,41 @@ fn parse_card(c: char) -> usize {
     }
 }
 
+// Function that finds the highest and second highest cards in a hand
+fn find_highest_and_second_highest(card_counts: &[usize]) -> (usize, usize) {
+    let mut highest = usize::MIN;
+    let mut second_highest = usize::MIN;
+
+    for count in card_counts {
+        if *count > highest {
+            second_highest = highest;
+            highest = *count;
+        } else if *count > second_highest {
+            second_highest = *count;
+        }
+    }
+
+    (highest, second_highest)
+}
+
 // Function that scores a hand of card based on type
-fn score_hand(mut card_counts: Vec<usize>) -> usize {
-    // Sort the card counts
-    card_counts.sort_by(|a, b| b.cmp(a));
+fn score_hand(card_counts: Vec<usize>) -> usize {
+    // Get the highest and second highest card counts
+    let (highest, second_highest) = find_highest_and_second_highest(&card_counts);
 
     // Based on the highest and second highest card counts assign a score
-    match card_counts[0] {
-        // (0) High card
+    match highest {
+        // (0) High card        (highest count is 1)
         1 => 0,
-        // (1) One pair         (second count is 1)
-        // (2) Two pair         (second count is 2)
-        2 => card_counts[1],
-        // (3) Three of a kind  (second count is 1)
-        // (4) Full house       (second count is 2)
-        3 => card_counts[1] + 2,
-        // (5) Four of a kind
+        // (1) One pair         (highest count is 2 and second highest count is 1)
+        // (2) Two pair         (highest count is 2 and second highest count is 2)
+        2 => second_highest,
+        // (3) Three of a kind  (highest count is 3 and second highest count is 1)
+        // (4) Full house       (highest count is 3 and second highest count is 2)
+        3 => second_highest + 2,
+        // (5) Four of a kind   (highest count is 4)
         4 => 5,
-        // (6) Five of a kind
+        // (6) Five of a kind   (highest count is 5)
         5 => 6,
         _ => panic!("Invalid card counts"),
     }
