@@ -47,7 +47,7 @@ fn main() {
     // Open the input file
     let file = File::open("input").expect("Could not open file \"input\" relative to program");
  
-    // Process the lines and sum the possible games
+    // Process the lines and sum the power of sets
     let total_result: u32 = BufReader::new(file)
         .lines()
         .par_bridge()
