@@ -58,7 +58,7 @@ fn main() {
         .for_each(|(name, directions)| {
             // Store the directions in the network
             network_temp.lock().unwrap()[name] = directions;
-    });
+        });
     let network = network_temp.lock().unwrap();
 
     // Traverse the network according to steps until we reach the END node

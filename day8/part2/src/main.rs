@@ -64,7 +64,7 @@ fn main() {
             if name % 26 == 0 {
                 start_nodes_temp.lock().unwrap().push(name);
             }
-    });
+        });
     let network = network_temp.lock().unwrap();
 
     // Traverse the network according to steps until we reach the END nodes
