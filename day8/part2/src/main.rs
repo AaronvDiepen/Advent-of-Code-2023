@@ -37,7 +37,7 @@ fn main() {
     // Open the input file
     let file = File::open("input").expect("Could not open file \"input\" relative to program");
 
-    // Parse the lines to hands
+    // Create a parser to parse the file
     let mut parser = BufReader::new(file).lines();
 
     // Get the stepping function and parse it to 0 if L and 1 if R
