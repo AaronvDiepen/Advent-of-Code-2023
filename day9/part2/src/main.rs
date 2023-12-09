@@ -20,13 +20,13 @@ fn process_line(line: String) -> i64 {
         // Combine the values into a new entry
         // We need to allow wrapping since partial sums can get very large
         .enumerate()
-        .fold(0, |sum, (index, value)| {
+        .fold(0, |new_entry, (index, value)| {
             if index & 1 == 0 {
                 // For even indexed values we need to add the value to the total
-                sum.wrapping_add(value)
+                new_entry.wrapping_add(value)
             } else {
                 // For odd indexed values we need to subtract the value from the total
-                sum.wrapping_sub(value)
+                new_entry.wrapping_sub(value)
             }
         })
 }
