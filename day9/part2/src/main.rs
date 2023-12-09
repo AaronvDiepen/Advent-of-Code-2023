@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-use rayon::prelude::*;
 use num_integer::IterBinomial;
+use rayon::prelude::*;
 
 // Function that processes each line
 fn process_line(line: String) -> i64 {
@@ -14,7 +14,6 @@ fn process_line(line: String) -> i64 {
     // Use the row of pascals triangle that is equal to the length of our input to calculate the new entry
     history.iter()
         // Multiply the entry with the values in the corresponding row of pascals triangle after skipping 1 entry
-        // This entry is where our new value would be in a 
         .zip(IterBinomial::new(history.len() as i64).skip(1))
         .map(|(entry, binomial)| binomial * entry)
         // Combine the values into a new entry
@@ -42,7 +41,6 @@ fn main() {
         .while_some()
         .map(process_line)
         .sum();
-
 
     // Print the final result
     println!("Summed extrapolated values: {:?}", total_result);

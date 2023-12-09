@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-use rayon::prelude::*;
 use num_integer::IterBinomial;
+use rayon::prelude::*;
 
 // Function that processes each line
 fn process_line(line: String) -> i64 {
@@ -21,10 +21,10 @@ fn process_line(line: String) -> i64 {
         .enumerate()
         .fold(0, |new_entry, (index, value)| {
             if index & 1 == 0 {
-                // For even indexed values we need to subtract the value to the total
+                // For odd indexed values we need to add the value from the total
                 new_entry.wrapping_add(value)
             } else {
-                // For odd indexed values we need to add the value from the total
+                // For even indexed values we need to subtract the value to the total
                 new_entry.wrapping_sub(value)
             }
         })
@@ -42,8 +42,6 @@ fn main() {
         .map(process_line)
         .sum();
 
-
     // Print the final result
     println!("Summed extrapolated values: {:?}", total_result);
-        
 }
