@@ -6,6 +6,7 @@ use num_integer::IterBinomial;
 
 // Function that processes each line
 fn process_line(line: String) -> i64 {
+    // Split the line into an array of numbers
     let history: Vec<i64> = line.split_whitespace()
         .filter_map(|num| num.parse().ok())
         .collect();
@@ -13,10 +14,9 @@ fn process_line(line: String) -> i64 {
     // Use the row of pascals triangle that is equal to the length of our input to calculate the new entry
     history.iter()
         // Multiply the entry with the values in the corresponding row of pascals triangle after skipping 1 entry
-        .zip(IterBinomial::new(history.len()).skip(1))
-        .map(|(entry, binomial)| {
-            binomial as i64 * entry
-        })
+        // This entry is where our new value would be in a 
+        .zip(IterBinomial::new(history.len() as i64).skip(1))
+        .map(|(entry, binomial)| binomial * entry)
         // Combine the values into a new entry
         // We need to allow wrapping since partial sums can get very large
         .enumerate()
