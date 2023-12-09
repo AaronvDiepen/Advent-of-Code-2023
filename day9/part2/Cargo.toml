@@ -1,0 +1,12 @@
+[package]
+name = "day9-part2"
+version = "1.0.0"
+authors = ["AaronvDiepen <aaronvdiepen@gmail.com>"]
+description = "Day 9 Part 2 of Advent of Code 2023"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+num-integer = "0.1.45"
+rayon = "1.8.0"
