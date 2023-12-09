@@ -68,25 +68,27 @@ fn main() {
     let network = network_temp.lock().unwrap();
 
     // Traverse the network according to steps until we reach the END nodes
+    // Then use Lowest Common Multiple to find step count that reaches all exit nodes
     let start_nodes = start_nodes_temp.lock().unwrap().clone();
-    let mut step_counts = vec!(0; start_nodes.len());
-    for (i, node) in start_nodes.iter().enumerate() {
-        let mut step_count = 0;
-        let mut current_node = *node;
-        for direction in steps.clone().cycle() {
-            // Take a step
-            step_count += 1;
-            current_node = network[current_node][direction];
-            if current_node % 26 == 25 {
-                step_counts[i] = step_count as u64;
-                break;
-            }
-        }
-    }
-
-    // Use Lowest Common Multiple to find step count that reaches all exit nodes
-    let step_count = step_counts.iter()
-        .fold(1, |current, step_count| lcm(current, *step_count));
+    let step_count = start_nodes.par_iter()
+        .map(|node| {
+            // Keep traversing the network while we have not reached an END node
+            // Count the number of steps it takes
+            let mut current_node = *node;
+            steps.clone().cycle()
+                .scan(1_u64, |step_count, direction| {
+                    *step_count += 1;
+                    current_node = network[current_node][direction];
+                    if current_node % 26 == 25 {
+                        return None;
+                    }
+                    Some(*step_count)
+                })
+                .last()
+                .expect("Could not reach an end node")
+        })
+        // Find the Lowest Common Multiple, i.e. how many times we need to repeat until we find END nodes for all
+        .reduce(|| 1_u64, |lcm_step_count, step_count| lcm(lcm_step_count, step_count));
     
     // Print the final result
     println!("Number of steps required: {}", step_count);
